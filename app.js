@@ -1,38 +1,324 @@
-(()=>{'use strict';
-const KEY='morrow.focus.v1',BUILD='1.5.0';
-const I={en:{'brand.tagline':'Low-friction momentum for busy brains.','nav.today':'Today','nav.time':'Time','nav.menu':'Menu','nav.me':'Me','common.add':'Add it','common.reset':'Reset','common.export':'Export','common.import':'Import','common.cancel':'Cancel','common.saveTask':'Save task','common.done':'Done','common.undo':'Undo','common.startTiny':'Start tiny','common.pause':'Pause','common.resume':'Resume','common.startVisibleTime':'Start visible time','common.sparks':'sparks','today.placeholder':'e.g. reply to that email…','today.openLoops':'Open loops','today.clearDone':'Clear done','today.empty':'Nothing here yet. Add the smallest thing that keeps tapping on your brain.','menu.taskDice':'Task dice','menu.dopamineTitle':'Dopamine menu','menu.roll':'Roll a doable task','menu.startIt':'Start it','menu.initialTitle':'Decision fatigue ends here.','menu.initialReason':'Choose one doable next move.','menu.noneTitle':'Nothing to roll yet.','menu.noneReason':'Add one open loop first.','menu.scanning':'Scanning for the lowest-friction doorway…','time.visibleTime':'Visible time','time.ready':'Ready when you are.','time.complete':'Window complete.','me.preferences':'Preferences','me.sessions':'Sessions','me.focusTime':'Focus time','me.language':'Language','me.languageCopy':'Switch instantly. Your choice stays on this device.','me.accent':'Accent mood','me.dataHere':'Data stays here','me.restore':'Bring data back','me.resetData':'Reset local data','me.gentleRules':'Gentle rules','me.noStreaks':'No streaks','me.noShame':'No shame copy','me.alwaysOn':'Always on','modal.eyebrow':'Make it startable','modal.title':'Add a task','modal.copy':'Only add enough structure to lower the wall.','modal.taskLabel':'What is the thing?','modal.durationLabel':'How long does it probably take?','modal.energyLabel':'Energy needed','modal.wallLabel':'How strong is the wall?','energy.low':'Low','energy.medium':'Medium','energy.high':'High','resistance.low':'Low friction','resistance.medium':'Some resistance','resistance.high':'Wall of awful','emergency.brand':'FOCUS / Emergency mode','emergency.kicker':'Nothing else matters right now','emergency.enough':'That was enough','emergency.another':'Give me another task','aria.openEmergency':'Open emergency mode','aria.emergencyMode':'Emergency mode','aria.newTask':'New task','aria.quickDefaults':'Quick task defaults','aria.visualTimer':'Time blindness visual timer','aria.languageChoice':'Choose language','aria.chooseTheme':'Choose accent theme','aria.mintTheme':'Mint theme','aria.violetTheme':'Violet theme','aria.emberTheme':'Ember theme','aria.mainNavigation':'Main navigation','aria.close':'Close','aria.closeEmergency':'Close emergency mode','aria.deleteTask':'Delete task'},de:{'brand.tagline':'Sanfter Schwung für volle Köpfe.','nav.today':'Heute','nav.time':'Zeit','nav.menu':'Menü','nav.me':'Ich','common.add':'Hinzufügen','common.reset':'Zurücksetzen','common.export':'Exportieren','common.import':'Importieren','common.cancel':'Abbrechen','common.saveTask':'Aufgabe speichern','common.done':'Erledigt','common.undo':'Rückgängig','common.startTiny':'Klein starten','common.pause':'Pause','common.resume':'Fortsetzen','common.startVisibleTime':'Zeit starten','common.sparks':'Sparks','today.placeholder':'z. B. auf diese E-Mail antworten…','today.openLoops':'Offene Schleifen','today.clearDone':'Erledigtes löschen','today.empty':'Hier ist noch nichts. Füge die kleinste Sache hinzu, die immer wieder im Kopf auftaucht.','menu.taskDice':'Task-Würfel','menu.dopamineTitle':'Dopamin-Menü','menu.roll':'Machbare Aufgabe würfeln','menu.startIt':'Starten','menu.initialTitle':'Entscheidungsstress endet hier.','menu.initialReason':'Wähle genau einen machbaren nächsten Schritt.','menu.noneTitle':'Noch nichts zum Würfeln.','menu.noneReason':'Füge zuerst eine offene Aufgabe hinzu.','menu.scanning':'Suche den Weg mit dem geringsten Widerstand…','time.visibleTime':'Sichtbare Zeit','time.ready':'Bereit, wenn du es bist.','time.complete':'Zeitfenster abgeschlossen.','me.preferences':'Einstellungen','me.sessions':'Sessions','me.focusTime':'Fokuszeit','me.language':'Sprache','me.languageCopy':'Sofort umschalten. Die Auswahl bleibt auf diesem Gerät.','me.accent':'Akzent','me.dataHere':'Daten bleiben hier','me.restore':'Daten wiederherstellen','me.resetData':'Lokale Daten löschen','me.gentleRules':'Sanfte Regeln','me.noStreaks':'Keine Streaks','me.noShame':'Keine Schuld-Sprache','me.alwaysOn':'Immer aktiv','modal.eyebrow':'Mach es startbar','modal.title':'Aufgabe hinzufügen','modal.copy':'Nur so viel Struktur wie nötig.','modal.taskLabel':'Was ist die Aufgabe?','modal.durationLabel':'Wie lange dauert sie ungefähr?','modal.energyLabel':'Benötigte Energie','modal.wallLabel':'Wie hoch ist die Hürde?','energy.low':'Niedrig','energy.medium':'Mittel','energy.high':'Hoch','resistance.low':'Kaum Reibung','resistance.medium':'Etwas Widerstand','resistance.high':'Wall of awful','emergency.brand':'FOCUS / Notfallmodus','emergency.kicker':'Gerade zählt nur das Nächste','emergency.enough':'Das war genug','emergency.another':'Andere Aufgabe','aria.openEmergency':'Notfallmodus öffnen','aria.emergencyMode':'Notfallmodus','aria.newTask':'Neue Aufgabe','aria.quickDefaults':'Schnelleinstellungen','aria.visualTimer':'Visueller Timer','aria.languageChoice':'Sprache auswählen','aria.chooseTheme':'Akzent auswählen','aria.mintTheme':'Mint','aria.violetTheme':'Violett','aria.emberTheme':'Ember','aria.mainNavigation':'Hauptnavigation','aria.close':'Schließen','aria.closeEmergency':'Notfallmodus schließen','aria.deleteTask':'Aufgabe löschen'}};
-const D={en:[['One song reset','Play one song. Stop when it ends.'],['Cold sensory cue','Cold water on wrists or face for 20 seconds.'],['Tiny movement','Stand up, stretch, walk to another room and back.'],['Novelty switch','Change chair, room, playlist or lighting.'],['Visible treat','Tea, coffee or a snack beside the task — not after it.'],['Body double cue','Send someone: “I’m starting this for 10 min.”']],de:[['Ein-Song-Reset','Spiele genau einen Song. Stopp, wenn er endet.'],['Kältereiz','20 Sekunden kaltes Wasser auf Handgelenke oder Gesicht.'],['Mini-Bewegung','Aufstehen, strecken, einmal in einen anderen Raum und zurück.'],['Neuheitswechsel','Wechsle Stuhl, Raum, Playlist oder Licht.'],['Sichtbarer Genuss','Tee, Kaffee oder Snack neben die Aufgabe — nicht erst danach.'],['Body-Double-Impuls','Schreib jemandem: „Ich starte das jetzt für 10 Minuten.“']]};
-const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],lang0=()=>navigator.language?.toLowerCase().startsWith('de')?'de':'en';
-const DEF={tasks:[],sparks:0,sessions:[],settings:{theme:'midnight',language:null},timer:{minutes:15},lastRolledTaskId:null};let state;try{state={...structuredClone(DEF),...JSON.parse(localStorage.getItem(KEY)||'{}')};state.settings={...DEF.settings,...state.settings};state.timer={...DEF.timer,...state.timer};}catch{state=structuredClone(DEF)}if(!['en','de'].includes(state.settings.language))state.settings.language=lang0();
-let quick=5,run=false,int=null,startAt=0,dur=state.timer.minutes*60000,left=dur,currentEmergency=null,emergencyAwarded=false,audioCtx=null;
-const t=k=>I[state.settings.language]?.[k]||I.en[k]||k,save=()=>localStorage.setItem(KEY,JSON.stringify(state)),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function tr(){document.documentElement.lang=state.settings.language;$$('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));$$('[data-i18n-placeholder]').forEach(e=>e.placeholder=t(e.dataset.i18nPlaceholder));$$('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));$$('[data-i18n-title]').forEach(e=>e.title=t(e.dataset.i18nTitle));$$('.language-option').forEach(b=>b.classList.toggle('active',b.dataset.language===state.settings.language));renderAll()}
-function toast(m){let e=$('#toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove('show'),1800)}
-function reward(){try{if(navigator.vibrate)navigator.vibrate(35);const C=window.AudioContext||window.webkitAudioContext;if(!C)return;audioCtx ||= new C();const n=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=528;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.08,n+.06);g.gain.exponentialRampToValueAtTime(.0001,n+.8);o.connect(g).connect(audioCtx.destination);o.start(n);o.stop(n+.82)}catch{}}
-function nav(s){$$('.screen').forEach(e=>e.classList.toggle('active',e.dataset.screen===s));$$('.nav-btn').forEach(e=>e.classList.toggle('active',e.dataset.nav===s))}
-function renderTasks(){const g=$('#taskGrid'),a=[...state.tasks.filter(x=>!x.done),...state.tasks.filter(x=>x.done)];if(!a.length){g.innerHTML=`<div class="empty-state">${t('today.empty')}</div>`;return}g.innerHTML=a.map(x=>`<article class="task-card ${x.done?'done':''}" data-task-id="${x.id}"><div class="task-topline"><div class="task-meta"><span class="pill">${x.minutes}m</span><span class="pill">${t('energy.'+x.energy)}</span><span class="pill">${t('resistance.'+({1:'low',2:'medium',3:'high'}[x.resistance]))}</span></div><button class="icon-btn" style="width:44px;height:44px" data-action="delete" aria-label="${t('aria.deleteTask')}">×</button></div><div class="task-title">${esc(x.title)}</div><div class="task-actions"><button class="secondary-btn" data-action="toggle">${x.done?t('common.undo'):t('common.done')}</button>${x.done?'':`<button class="ghost-btn" data-action="start">${t('common.startTiny')}</button>`}</div></article>`).join('')}
-function renderStats(){let m=state.sessions.reduce((s,x)=>s+(x.minutes||0),0);$('#sparkCount').textContent=state.sparks;$('#meSparkCount').textContent=state.sparks;$('#sessionCount').textContent=state.sessions.length;$('#focusMinutes').textContent=`${m} min`;document.documentElement.dataset.theme=state.settings.theme;$$('.theme-dot').forEach(b=>b.classList.toggle('active',b.dataset.themeValue===state.settings.theme))}
-function renderD(){ $('#dopamineItems').innerHTML=D[state.settings.language].map((x,i)=>`<button class="dopamine-item" data-d="${i}">${x[0]}<small>${x[1]}</small></button>`).join('') }
-function renderDice(){let x=state.tasks.find(x=>x.id===state.lastRolledTaskId&&!x.done);$('#diceResult').textContent=x?x.title:t('menu.initialTitle');$('#diceReason').textContent=x?`${x.minutes} min · ${t('energy.'+x.energy)}`:t('menu.initialReason');$('#startRolledBtn').disabled=!x}
-function renderAll(){renderTasks();renderStats();renderD();renderDice();updateTimer()}
-function add(title,minutes=quick,energy='low',resistance=2){title=title.trim();if(!title)return;state.tasks.unshift({id:uid(),title,minutes:+minutes,energy,resistance:+resistance,done:false});save();renderAll();toast(state.settings.language==='de'?'Erfasst.':'Captured.')}
-function toggle(id){let x=state.tasks.find(x=>x.id===id);if(!x)return;x.done=!x.done;if(x.done){state.sparks+=x.resistance===3?3:x.resistance===2?2:1;reward()}save();renderAll()}
-function pick(){let a=state.tasks.filter(x=>!x.done);if(!a.length)return null;return a.sort(()=>Math.random()-.5).sort((a,b)=>(a.minutes-b.minutes)+(a.resistance-b.resistance)*4)[0]}
-function roll(){let x=pick();if(!x){$('#diceResult').textContent=t('menu.noneTitle');$('#diceReason').textContent=t('menu.noneReason');return}$('#diceResult').textContent=t('menu.scanning');setTimeout(()=>{state.lastRolledTaskId=x.id;save();renderDice()},500)}
-function setMin(m){if(run)pause();state.timer.minutes=+m;dur=left=+m*60000;save();updateTimer();$$('[data-timer-minutes]').forEach(b=>b.classList.toggle('active',+b.dataset.timerMinutes===+m))}
-function fmt(ms){let s=Math.ceil(Math.max(0,ms)/1000);return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
-function updateTimer(){let r=dur?1-left/dur:0;$('#timerDigits').textContent=fmt(left);$('#timeOrbit').style.setProperty('--p',`${r*360}deg`);$('#timerPhase').textContent=run?(r<.8?(state.settings.language==='de'?'Bleib beim nächsten sichtbaren Schritt.':'Stay with the next visible step.'):(state.settings.language==='de'?'Landung.':'Landing zone.')):t('time.ready');$('#timerToggleBtn').textContent=run?t('common.pause'):(left<dur?t('common.resume'):t('common.startVisibleTime'))}
-function start(){if(run)return;run=true;startAt=Date.now()-(dur-left);int=setInterval(()=>{left=Math.max(0,dur-(Date.now()-startAt));updateTimer();if(left<=0)finish()},250);updateTimer()}
-function pause(){run=false;clearInterval(int);int=null;updateTimer()}
-function finish(){pause();state.sessions.unshift({id:uid(),minutes:state.timer.minutes,finishedAt:new Date().toISOString()});state.sparks++;save();reward();renderAll();$('#timerPhase').textContent=t('time.complete')}
-function resetTimer(){pause();left=dur;updateTimer()}
-function micro(task){let title=task?.title||(state.settings.language==='de'?'diese Aufgabe':'this task');return state.settings.language==='de'?[`Schritt 1: Öffne oder lege „${title}“ vor dich hin.`,`Schritt 2: Starte die erste sichtbare Teilhandlung für genau 60 Sekunden.`,`Schritt 3: Entscheide danach: 2 Minuten weitermachen oder ohne Schuld stoppen.`]:[`Step 1: Open or place “${title}” in front of you.`,`Step 2: Start the first visible action for exactly 60 seconds.`,`Step 3: Then choose: continue for 2 minutes or stop without guilt.`]}
-function openEmergency(id){let x=state.tasks.find(x=>x.id===id&&!x.done)||state.tasks.find(x=>x.id===state.lastRolledTaskId&&!x.done)||pick();currentEmergency=x?.id||null;emergencyAwarded=false;$('#emergencyTitle').textContent=x?x.title:(state.settings.language==='de'?'Nur die nächsten 60 Sekunden.':'Only the next 60 seconds.');$('#emergencyCopy').textContent=state.settings.language==='de'?'Drei Schritte. Kein Planen, keine Schuld.':'Three moves. No planning, no guilt.';$('#microSteps').innerHTML=micro(x).map((s,i)=>`<button class="micro-step" data-step="${i}"><span class="step-num">${i+1}</span><strong>${esc(s)}</strong></button>`).join('');$('#emergencyBackdrop').classList.add('open')}
-function closeEmergency(){$('#emergencyBackdrop').classList.remove('open')}
-function checkEmergency(){let a=$$('.micro-step');if(a.length&&a.every(x=>x.classList.contains('done'))&&!emergencyAwarded){emergencyAwarded=true;state.sparks++;save();reward();renderStats();toast(state.settings.language==='de'?'+1 Spark — drei Mikro-Schritte geschafft.':'+1 spark — three micro-steps complete.')}}
-function exportData(){let b=new Blob([JSON.stringify({data:state},null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='focus-backup.json';a.click();URL.revokeObjectURL(u)}
-async function importData(f){try{let p=JSON.parse(await f.text()),n=p.data||p;if(!Array.isArray(n.tasks))throw 0;state={...structuredClone(DEF),...n,settings:{...DEF.settings,...n.settings}};save();tr()}catch{toast(state.settings.language==='de'?'Ungültiges Backup.':'Invalid backup.')}}
-function bind(){$$('.nav-btn').forEach(b=>b.onclick=()=>nav(b.dataset.nav));$$('[data-menu-view]').forEach(b=>b.onclick=()=>{$$('[data-menu-view]').forEach(x=>x.classList.toggle('active',x===b));$('#menuPaneDice').classList.toggle('active',b.dataset.menuView==='dice');$('#menuPaneDopamine').classList.toggle('active',b.dataset.menuView==='dopamine')});$('#quickCaptureForm').onsubmit=e=>{e.preventDefault();add($('#quickTaskInput').value);$('#quickTaskInput').value=''};$$('[data-duration]').forEach(b=>b.onclick=()=>{quick=+b.dataset.duration;$$('[data-duration]').forEach(x=>x.classList.toggle('active',x===b))});$('#taskGrid').onclick=e=>{let a=e.target.closest('[data-action]'),c=e.target.closest('[data-task-id]');if(!a||!c)return;let id=c.dataset.taskId;if(a.dataset.action==='delete'){state.tasks=state.tasks.filter(x=>x.id!==id);save();renderAll()}if(a.dataset.action==='toggle')toggle(id);if(a.dataset.action==='start')openEmergency(id)};$('#clearDoneBtn').onclick=()=>{state.tasks=state.tasks.filter(x=>!x.done);save();renderAll()};$('#taskForm').onsubmit=e=>{e.preventDefault();add($('#taskTitleInput').value,+$('#taskMinutesInput').value,$('#taskEnergyInput').value,+$('#taskResistanceInput').value);$('#taskModalBackdrop').classList.remove('open')};$('#closeTaskModalBtn').onclick=$('#cancelTaskModalBtn').onclick=()=>$('#taskModalBackdrop').classList.remove('open');$('#rollBtn').onclick=roll;$('#startRolledBtn').onclick=()=>{let x=state.tasks.find(x=>x.id===state.lastRolledTaskId);if(!x)return;setMin(x.minutes);nav('time');start()};$('#dopamineItems').onclick=e=>{let b=e.target.closest('[data-d]');if(b)toast(D[state.settings.language][+b.dataset.d].join(': '))};$$('[data-timer-minutes]').forEach(b=>b.onclick=()=>setMin(+b.dataset.timerMinutes));$('#timerToggleBtn').onclick=()=>run?pause():start();$('#timerResetBtn').onclick=resetTimer;$('#emergencyBtn').onclick=()=>openEmergency();$('#closeEmergencyBtn').onclick=closeEmergency;$('#emergencySwapBtn').onclick=()=>openEmergency();$('#emergencyDoneBtn').onclick=()=>closeEmergency();$('#microSteps').onclick=e=>{let s=e.target.closest('.micro-step');if(s){s.classList.toggle('done');checkEmergency()}};$$('.theme-dot').forEach(b=>b.onclick=()=>{state.settings.theme=b.dataset.themeValue;save();renderStats()});$$('.language-option').forEach(b=>b.onclick=()=>{state.settings.language=b.dataset.language;save();tr()});$('#exportBtn').onclick=exportData;$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=e=>{if(e.target.files[0])importData(e.target.files[0])};$('#resetDataBtn').onclick=()=>{if(confirm(state.settings.language==='de'?'Alle lokalen FOCUS-Daten löschen?':'Delete all local FOCUS data?')){state=structuredClone(DEF);state.settings.language=lang0();save();tr()}}}
-function sw(){if(!('serviceWorker'in navigator))return;let re=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!re){re=true;location.reload()}});addEventListener('load',async()=>{try{let r=await navigator.serviceWorker.register(`./sw.js?v=${BUILD}`,{updateViaCache:'none'});const u=()=>r.update().then(()=>{if(r.waiting)r.waiting.postMessage({type:'SKIP_WAITING'})}).catch(()=>{});await u();document.addEventListener('visibilitychange',()=>document.visibilityState==='visible'&&u());addEventListener('focus',u)}catch{}})}
-bind();tr();setMin(state.timer.minutes);save();sw();
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'morrow.focus.v1';
+  const BUILD = '1.6.0';
+
+  const i18n = {
+    en: {
+      'nav.today': 'Today', 'nav.time': 'Time', 'nav.menu': 'Menu', 'nav.me': 'Me',
+      'common.add': 'Add', 'common.reset': 'Reset', 'common.export': 'Export', 'common.import': 'Import',
+      'common.cancel': 'Cancel', 'common.saveTask': 'Save task', 'common.done': 'Done', 'common.undo': 'Undo',
+      'common.startTiny': 'Start tiny', 'common.pause': 'Pause', 'common.resume': 'Resume', 'common.startVisibleTime': 'Start', 'common.sparks': 'Sparks',
+      'today.placeholder': 'What needs doing?', 'today.openLoops': 'Open loops', 'today.clearDone': 'Clear done', 'today.empty': 'Nothing open.',
+      'menu.taskDice': 'Task dice', 'menu.dopamineTitle': 'Dopamine menu', 'menu.roll': 'Roll', 'menu.startIt': 'Start it',
+      'menu.initialTitle': 'Pick one thing.', 'menu.noneTitle': 'Nothing to roll.', 'menu.scanning': 'Choosing…',
+      'me.preferences': 'Preferences', 'me.sessions': 'Sessions', 'me.focusTime': 'Focus time', 'me.language': 'Language', 'me.accent': 'Accent',
+      'me.dataHere': 'Export data', 'me.restore': 'Restore data', 'me.resetData': 'Reset data',
+      'modal.title': 'Add task', 'modal.taskLabel': 'Task', 'modal.durationLabel': 'Duration', 'modal.energyLabel': 'Energy', 'modal.wallLabel': 'Friction',
+      'energy.low': 'Low', 'energy.medium': 'Medium', 'energy.high': 'High',
+      'resistance.low': 'Easy', 'resistance.medium': 'Some friction', 'resistance.high': 'Big wall',
+      'emergency.brand': 'FOCUS / Emergency', 'emergency.enough': 'Enough for now', 'emergency.another': 'Another task',
+      'emergency.defaultTitle': 'Only the next 60 seconds.', 'emergency.micro1': 'Open or place “{title}” in front of you.',
+      'emergency.micro2': 'Do the first visible action for exactly 60 seconds.', 'emergency.micro3': 'Then choose: continue for 2 minutes or stop without guilt.',
+      'emergency.fallbackTask': 'this task',
+      'aria.openEmergency': 'Open emergency mode', 'aria.emergencyMode': 'Emergency mode', 'aria.newTask': 'New task',
+      'aria.quickDefaults': 'Quick duration', 'aria.visualTimer': 'Visual timer', 'aria.languageChoice': 'Choose language',
+      'aria.chooseTheme': 'Choose accent theme', 'aria.mintTheme': 'Mint theme', 'aria.violetTheme': 'Violet theme', 'aria.emberTheme': 'Ember theme',
+      'aria.mainNavigation': 'Main navigation', 'aria.close': 'Close', 'aria.closeEmergency': 'Close emergency mode', 'aria.deleteTask': 'Delete task',
+      'dopamine.songTitle': 'One song', 'dopamine.songNote': 'Play one song, then begin.',
+      'dopamine.coldTitle': 'Cold cue', 'dopamine.coldNote': 'Cold water on wrists for 20 seconds.',
+      'dopamine.moveTitle': 'Move', 'dopamine.moveNote': 'Stand, stretch, walk there and back.',
+      'dopamine.noveltyTitle': 'Switch it', 'dopamine.noveltyNote': 'Change seat, room, light or playlist.',
+      'dopamine.treatTitle': 'Bring a treat', 'dopamine.treatNote': 'Tea, coffee or a snack beside the task.',
+      'toast.captured': 'Captured.', 'toast.done': 'Done. Momentum kept.', 'toast.hardWall': 'Big wall crossed.',
+      'toast.nothingClear': 'Nothing to clear.', 'toast.cleared': '{count} cleared.', 'toast.emergencySpark': '+1 Spark.',
+      'toast.timerComplete': 'Time complete.', 'toast.exported': 'Backup exported.', 'toast.restored': 'Backup restored.',
+      'toast.invalidBackup': 'Invalid backup.', 'toast.reset': 'Local data reset.', 'confirm.reset': 'Delete all local FOCUS data?'
+    },
+    de: {
+      'nav.today': 'Heute', 'nav.time': 'Zeit', 'nav.menu': 'Menü', 'nav.me': 'Ich',
+      'common.add': 'Hinzufügen', 'common.reset': 'Zurücksetzen', 'common.export': 'Export', 'common.import': 'Import',
+      'common.cancel': 'Abbrechen', 'common.saveTask': 'Speichern', 'common.done': 'Erledigt', 'common.undo': 'Rückgängig',
+      'common.startTiny': 'Klein starten', 'common.pause': 'Pause', 'common.resume': 'Weiter', 'common.startVisibleTime': 'Starten', 'common.sparks': 'Sparks',
+      'today.placeholder': 'Was steht an?', 'today.openLoops': 'Offene Schleifen', 'today.clearDone': 'Erledigtes löschen', 'today.empty': 'Nichts offen.',
+      'menu.taskDice': 'Würfel', 'menu.dopamineTitle': 'Dopamin-Menü', 'menu.roll': 'Würfeln', 'menu.startIt': 'Starten',
+      'menu.initialTitle': 'Wähle eine Sache.', 'menu.noneTitle': 'Nichts zum Würfeln.', 'menu.scanning': 'Wähle…',
+      'me.preferences': 'Einstellungen', 'me.sessions': 'Sessions', 'me.focusTime': 'Fokuszeit', 'me.language': 'Sprache', 'me.accent': 'Akzent',
+      'me.dataHere': 'Daten exportieren', 'me.restore': 'Daten importieren', 'me.resetData': 'Daten löschen',
+      'modal.title': 'Aufgabe hinzufügen', 'modal.taskLabel': 'Aufgabe', 'modal.durationLabel': 'Dauer', 'modal.energyLabel': 'Energie', 'modal.wallLabel': 'Hürde',
+      'energy.low': 'Niedrig', 'energy.medium': 'Mittel', 'energy.high': 'Hoch',
+      'resistance.low': 'Leicht', 'resistance.medium': 'Etwas Reibung', 'resistance.high': 'Große Hürde',
+      'emergency.brand': 'FOCUS / Notfall', 'emergency.enough': 'Genug für jetzt', 'emergency.another': 'Andere Aufgabe',
+      'emergency.defaultTitle': 'Nur die nächsten 60 Sekunden.', 'emergency.micro1': 'Öffne oder lege „{title}“ vor dich hin.',
+      'emergency.micro2': 'Mach die erste sichtbare Teilhandlung für genau 60 Sekunden.', 'emergency.micro3': 'Dann entscheide: 2 Minuten weitermachen oder ohne Schuldgefühl stoppen.',
+      'emergency.fallbackTask': 'diese Aufgabe',
+      'aria.openEmergency': 'Notfallmodus öffnen', 'aria.emergencyMode': 'Notfallmodus', 'aria.newTask': 'Neue Aufgabe',
+      'aria.quickDefaults': 'Schnelle Dauer', 'aria.visualTimer': 'Visueller Timer', 'aria.languageChoice': 'Sprache auswählen',
+      'aria.chooseTheme': 'Akzent auswählen', 'aria.mintTheme': 'Mint', 'aria.violetTheme': 'Violett', 'aria.emberTheme': 'Ember',
+      'aria.mainNavigation': 'Hauptnavigation', 'aria.close': 'Schließen', 'aria.closeEmergency': 'Notfallmodus schließen', 'aria.deleteTask': 'Aufgabe löschen',
+      'dopamine.songTitle': 'Ein Song', 'dopamine.songNote': 'Einen Song hören, dann beginnen.',
+      'dopamine.coldTitle': 'Kältereiz', 'dopamine.coldNote': '20 Sekunden kaltes Wasser auf die Handgelenke.',
+      'dopamine.moveTitle': 'Bewegen', 'dopamine.moveNote': 'Aufstehen, strecken, kurz hin und zurück.',
+      'dopamine.noveltyTitle': 'Wechsel', 'dopamine.noveltyNote': 'Stuhl, Raum, Licht oder Playlist ändern.',
+      'dopamine.treatTitle': 'Genuss dazu', 'dopamine.treatNote': 'Tee, Kaffee oder Snack neben die Aufgabe.',
+      'toast.captured': 'Erfasst.', 'toast.done': 'Erledigt. Momentum bleibt.', 'toast.hardWall': 'Große Hürde geschafft.',
+      'toast.nothingClear': 'Nichts zu löschen.', 'toast.cleared': '{count} gelöscht.', 'toast.emergencySpark': '+1 Spark.',
+      'toast.timerComplete': 'Zeit abgeschlossen.', 'toast.exported': 'Backup exportiert.', 'toast.restored': 'Backup wiederhergestellt.',
+      'toast.invalidBackup': 'Ungültiges Backup.', 'toast.reset': 'Lokale Daten gelöscht.', 'confirm.reset': 'Alle lokalen FOCUS-Daten löschen?'
+    }
+  };
+
+  const DOPAMINE_KEYS = [
+    ['dopamine.songTitle', 'dopamine.songNote'],
+    ['dopamine.coldTitle', 'dopamine.coldNote'],
+    ['dopamine.moveTitle', 'dopamine.moveNote'],
+    ['dopamine.noveltyTitle', 'dopamine.noveltyNote'],
+    ['dopamine.treatTitle', 'dopamine.treatNote']
+  ];
+
+  const DEFAULT_STATE = {
+    tasks: [], sparks: 0, sessions: [],
+    settings: { theme: 'midnight', language: null },
+    timer: { minutes: 15 }, lastRolledTaskId: null
+  };
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const detectLanguage = () => String(navigator.language || '').toLowerCase().startsWith('de') ? 'de' : 'en';
+  const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  let state = loadState();
+  let quickMinutes = 5;
+  let timerInterval = null, timerStartedAt = 0, timerRunning = false;
+  let timerDurationMs = state.timer.minutes * 60000, timerRemainingMs = timerDurationMs;
+  let currentEmergencyTaskId = null, emergencySparkAwarded = false, audioContext = null;
+  let rouletteMode = 'initial';
+
+  function loadState() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const next = { ...structuredClone(DEFAULT_STATE), ...parsed };
+      next.tasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+      next.sessions = Array.isArray(parsed.sessions) ? parsed.sessions : [];
+      next.settings = { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) };
+      next.timer = { ...DEFAULT_STATE.timer, ...(parsed.timer || {}) };
+      if (!['en', 'de'].includes(next.settings.language)) next.settings.language = detectLanguage();
+      return next;
+    } catch {
+      const next = structuredClone(DEFAULT_STATE); next.settings.language = detectLanguage(); return next;
+    }
+  }
+
+  const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const t = (key, vars = {}) => {
+    let text = i18n[state.settings.language]?.[key] ?? i18n.en[key] ?? key;
+    Object.entries(vars).forEach(([k, v]) => { text = text.replaceAll(`{${k}}`, String(v)); });
+    return text;
+  };
+
+  function applyTranslations() {
+    document.documentElement.lang = state.settings.language;
+    $$('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    $$('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+    $$('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+    $$('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+    $$('.language-option').forEach(btn => btn.classList.toggle('active', btn.dataset.language === state.settings.language));
+  }
+
+  function toast(message) {
+    const el = $('#toast'); el.textContent = message; el.classList.add('show'); clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => el.classList.remove('show'), 1700);
+  }
+
+  function rewardFeedback() {
+    try {
+      navigator.vibrate?.(35);
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      audioContext ||= new AudioCtx();
+      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+      const now = audioContext.currentTime, osc = audioContext.createOscillator(), gain = audioContext.createGain();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(528, now);
+      gain.gain.setValueAtTime(0.0001, now); gain.gain.exponentialRampToValueAtTime(0.075, now + 0.06); gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+      osc.connect(gain).connect(audioContext.destination); osc.start(now); osc.stop(now + 0.82);
+    } catch {}
+  }
+
+  function navigate(screen) {
+    $$('.screen').forEach(el => el.classList.toggle('active', el.dataset.screen === screen));
+    $$('.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.nav === screen));
+  }
+
+  function energyLabel(value) { return t(`energy.${value}`); }
+  function resistanceLabel(value) { return t(`resistance.${({ 1: 'low', 2: 'medium', 3: 'high' })[value] || 'medium'}`); }
+
+  function renderTasks() {
+    const root = $('#taskGrid');
+    const items = [...state.tasks.filter(x => !x.done), ...state.tasks.filter(x => x.done)];
+    if (!items.length) { root.innerHTML = `<div class="empty-state">${esc(t('today.empty'))}</div>`; return; }
+    root.innerHTML = items.map(task => `
+      <article class="task-card ${task.done ? 'done' : ''}" data-task-id="${task.id}">
+        <div class="task-topline">
+          <div class="task-meta"><span class="pill">${task.minutes}m</span><span class="pill">${esc(energyLabel(task.energy))}</span><span class="pill">${esc(resistanceLabel(task.resistance))}</span></div>
+          <button class="icon-btn" type="button" data-action="delete" aria-label="${esc(t('aria.deleteTask'))}">×</button>
+        </div>
+        <div class="task-title">${esc(task.title)}</div>
+        <div class="task-actions">
+          <button class="secondary-btn" type="button" data-action="toggle">${task.done ? t('common.undo') : t('common.done')}</button>
+          ${task.done ? '' : `<button class="ghost-btn" type="button" data-action="start">${t('common.startTiny')}</button>`}
+        </div>
+      </article>`).join('');
+  }
+
+  function renderStats() {
+    const totalMinutes = state.sessions.reduce((sum, x) => sum + Number(x.minutes || 0), 0);
+    $('#sparkCount').textContent = state.sparks; $('#meSparkCount').textContent = state.sparks;
+    $('#sessionCount').textContent = state.sessions.length; $('#focusMinutes').textContent = `${totalMinutes} min`;
+    document.documentElement.dataset.theme = state.settings.theme;
+    $$('.theme-dot').forEach(btn => btn.classList.toggle('active', btn.dataset.themeValue === state.settings.theme));
+  }
+
+  function renderDopamineMenu() {
+    $('#dopamineItems').innerHTML = DOPAMINE_KEYS.map(([title, note], index) =>
+      `<button class="dopamine-item" type="button" data-dopamine-index="${index}">${esc(t(title))}<small>${esc(t(note))}</small></button>`
+    ).join('');
+  }
+
+  function renderRouletteState() {
+    const task = state.tasks.find(x => x.id === state.lastRolledTaskId && !x.done);
+    const result = $('#diceResult'), startBtn = $('#startRolledBtn');
+    if (rouletteMode === 'result' && task) { result.textContent = task.title; startBtn.disabled = false; }
+    else { rouletteMode = 'initial'; result.textContent = t('menu.initialTitle'); startBtn.disabled = true; }
+  }
+
+  function renderAll() { applyTranslations(); renderTasks(); renderStats(); renderDopamineMenu(); renderRouletteState(); updateTimerUI(); }
+
+  function createTask(title, minutes = quickMinutes, energy = 'low', resistance = 2) {
+    title = String(title || '').trim(); if (!title) return;
+    state.tasks.unshift({ id: uid(), title, minutes: Number(minutes), energy, resistance: Number(resistance), done: false, createdAt: new Date().toISOString() });
+    saveState(); renderAll(); toast(t('toast.captured'));
+  }
+
+  function toggleTask(id) {
+    const task = state.tasks.find(x => x.id === id); if (!task) return;
+    task.done = !task.done;
+    if (task.done) { state.sparks += task.resistance === 3 ? 3 : task.resistance === 2 ? 2 : 1; rewardFeedback(); toast(t(task.resistance === 3 ? 'toast.hardWall' : 'toast.done')); }
+    saveState(); renderAll();
+  }
+
+  function deleteTask(id) { state.tasks = state.tasks.filter(x => x.id !== id); if (state.lastRolledTaskId === id) state.lastRolledTaskId = null; saveState(); renderAll(); }
+  function clearDone() { const count = state.tasks.filter(x => x.done).length; if (!count) return toast(t('toast.nothingClear')); state.tasks = state.tasks.filter(x => !x.done); saveState(); renderAll(); toast(t('toast.cleared', { count })); }
+
+  function pickTask() {
+    const open = state.tasks.filter(x => !x.done); if (!open.length) return null;
+    const score = x => (x.energy === 'low' ? 3 : x.energy === 'medium' ? 2 : 1) + (x.minutes <= 5 ? 4 : x.minutes <= 15 ? 3 : x.minutes <= 30 ? 2 : 1) - (x.resistance === 3 ? 2 : x.resistance === 2 ? 1 : 0) + Math.random() * 2;
+    return open.map(task => ({ task, score: score(task) })).sort((a, b) => b.score - a.score)[0].task;
+  }
+
+  function rollTask() {
+    const result = $('#diceResult'), startBtn = $('#startRolledBtn'), stage = $('#rouletteStage');
+    const task = pickTask();
+    if (!task) { rouletteMode = 'none'; result.textContent = t('menu.noneTitle'); startBtn.disabled = true; return; }
+    rouletteMode = 'scanning'; result.textContent = t('menu.scanning'); startBtn.disabled = true; stage.classList.add('spinning');
+    setTimeout(() => { stage.classList.remove('spinning'); state.lastRolledTaskId = task.id; rouletteMode = 'result'; saveState(); renderRouletteState(); }, 420);
+  }
+
+  function startRolledTaskTimer() {
+    const task = state.tasks.find(x => x.id === state.lastRolledTaskId && !x.done);
+    if (!task) return;
+    setTimerMinutes(task.minutes); navigate('time'); startTimer();
+  }
+
+  function generateMicroSteps(task) {
+    const raw = task?.title?.trim() || t('emergency.fallbackTask'); const title = raw.length > 70 ? `${raw.slice(0, 67)}…` : raw;
+    return [t('emergency.micro1', { title }), t('emergency.micro2'), t('emergency.micro3')];
+  }
+
+  function renderEmergency() {
+    const task = state.tasks.find(x => x.id === currentEmergencyTaskId && !x.done) || null;
+    $('#emergencyTitle').textContent = task ? task.title : t('emergency.defaultTitle');
+    $('#microSteps').innerHTML = generateMicroSteps(task).map((step, i) => `<button class="micro-step" type="button" data-step="${i}"><span class="step-num">${i + 1}</span><strong>${esc(step)}</strong></button>`).join('');
+  }
+
+  function openEmergency(id = null) {
+    const task = (id && state.tasks.find(x => x.id === id && !x.done)) || (state.lastRolledTaskId && state.tasks.find(x => x.id === state.lastRolledTaskId && !x.done)) || pickTask();
+    currentEmergencyTaskId = task?.id || null; emergencySparkAwarded = false; renderEmergency(); $('#emergencyBackdrop').classList.add('open');
+  }
+  function closeEmergency() { $('#emergencyBackdrop').classList.remove('open'); }
+  function emergencySwap() { const choices = state.tasks.filter(x => !x.done && x.id !== currentEmergencyTaskId); const task = choices.length ? choices[Math.floor(Math.random() * choices.length)] : pickTask(); currentEmergencyTaskId = task?.id || null; emergencySparkAwarded = false; renderEmergency(); }
+  function checkEmergencyCompletion() {
+    const steps = $$('#microSteps .micro-step');
+    if (steps.length && steps.every(x => x.classList.contains('done')) && !emergencySparkAwarded) {
+      emergencySparkAwarded = true; state.sparks += 1; saveState(); rewardFeedback(); renderStats(); toast(t('toast.emergencySpark'));
+    }
+  }
+
+  function setTimerMinutes(minutes, persist = true) {
+    if (timerRunning) pauseTimer(); state.timer.minutes = Number(minutes); if (persist) saveState();
+    timerDurationMs = state.timer.minutes * 60000; timerRemainingMs = timerDurationMs;
+    $$('[data-timer-minutes]').forEach(btn => btn.classList.toggle('active', Number(btn.dataset.timerMinutes) === state.timer.minutes)); updateTimerUI();
+  }
+  function formatMs(ms) { const total = Math.max(0, Math.ceil(ms / 1000)); return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`; }
+  function updateTimerUI() {
+    $('#timerDigits').textContent = formatMs(timerRemainingMs);
+    const ratio = timerDurationMs ? Math.min(1, (timerDurationMs - timerRemainingMs) / timerDurationMs) : 0;
+    $('#timeOrbit').style.setProperty('--p', `${ratio * 360}deg`);
+    $('#timerToggleBtn').textContent = timerRunning ? t('common.pause') : (timerRemainingMs < timerDurationMs ? t('common.resume') : t('common.startVisibleTime'));
+  }
+  function startTimer() { if (timerRunning) return; timerRunning = true; timerStartedAt = Date.now() - (timerDurationMs - timerRemainingMs); timerInterval = setInterval(tickTimer, 250); updateTimerUI(); }
+  function pauseTimer() { if (!timerRunning) return; timerRunning = false; clearInterval(timerInterval); timerInterval = null; updateTimerUI(); }
+  function tickTimer() { if (timerRunning) timerRemainingMs = Math.max(0, timerDurationMs - (Date.now() - timerStartedAt)); updateTimerUI(); if (timerRemainingMs <= 0 && timerRunning) finishTimer(); }
+  function finishTimer() { pauseTimer(); state.sessions.unshift({ id: uid(), minutes: state.timer.minutes, finishedAt: new Date().toISOString() }); state.sparks += 1; saveState(); rewardFeedback(); renderAll(); toast(t('toast.timerComplete')); }
+  function resetTimer() { pauseTimer(); timerRemainingMs = timerDurationMs; timerStartedAt = 0; updateTimerUI(); }
+
+  function exportData() {
+    const blob = new Blob([JSON.stringify({ product: 'FOCUS / by Morrow', version: 1, exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `focus-morrow-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(url); toast(t('toast.exported'));
+  }
+  async function importData(file) {
+    try {
+      const parsed = JSON.parse(await file.text()), incoming = parsed.data || parsed;
+      if (!incoming || !Array.isArray(incoming.tasks) || !Array.isArray(incoming.sessions)) throw new Error();
+      state = { ...structuredClone(DEFAULT_STATE), ...incoming, settings: { ...DEFAULT_STATE.settings, ...(incoming.settings || {}) }, timer: { ...DEFAULT_STATE.timer, ...(incoming.timer || {}) } };
+      if (!['en', 'de'].includes(state.settings.language)) state.settings.language = detectLanguage(); saveState(); setTimerMinutes(state.timer.minutes, false); renderAll(); toast(t('toast.restored'));
+    } catch { toast(t('toast.invalidBackup')); }
+  }
+  function resetData() { if (!confirm(t('confirm.reset'))) return; localStorage.removeItem(STORAGE_KEY); state = structuredClone(DEFAULT_STATE); state.settings.language = detectLanguage(); setTimerMinutes(15, false); saveState(); renderAll(); toast(t('toast.reset')); }
+
+  function bindEvents() {
+    $$('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.nav)));
+    $$('[data-menu-view]').forEach(btn => btn.addEventListener('click', () => { const view = btn.dataset.menuView; $$('[data-menu-view]').forEach(x => x.classList.toggle('active', x === btn)); $('#menuPaneDice').classList.toggle('active', view === 'dice'); $('#menuPaneDopamine').classList.toggle('active', view === 'dopamine'); }));
+    $('#quickCaptureForm').addEventListener('submit', e => { e.preventDefault(); createTask($('#quickTaskInput').value); $('#quickTaskInput').value = ''; });
+    $$('[data-duration]').forEach(btn => btn.addEventListener('click', () => { quickMinutes = Number(btn.dataset.duration); $$('[data-duration]').forEach(x => x.classList.toggle('active', x === btn)); }));
+    $('#taskGrid').addEventListener('click', e => { const action = e.target.closest('[data-action]'), card = e.target.closest('[data-task-id]'); if (!action || !card) return; const id = card.dataset.taskId; if (action.dataset.action === 'delete') deleteTask(id); if (action.dataset.action === 'toggle') toggleTask(id); if (action.dataset.action === 'start') openEmergency(id); });
+    $('#clearDoneBtn').addEventListener('click', clearDone); $('#rollBtn').addEventListener('click', rollTask); $('#startRolledBtn').addEventListener('click', startRolledTaskTimer);
+    $('#dopamineItems').addEventListener('click', e => { const btn = e.target.closest('[data-dopamine-index]'); if (!btn) return; const [title, note] = DOPAMINE_KEYS[Number(btn.dataset.dopamineIndex)]; toast(`${t(title)} · ${t(note)}`); });
+    $$('[data-timer-minutes]').forEach(btn => btn.addEventListener('click', () => setTimerMinutes(Number(btn.dataset.timerMinutes))));
+    $('#timerToggleBtn').addEventListener('click', () => timerRunning ? pauseTimer() : startTimer()); $('#timerResetBtn').addEventListener('click', resetTimer);
+    $('#emergencyBtn').addEventListener('click', () => openEmergency()); $('#closeEmergencyBtn').addEventListener('click', closeEmergency); $('#emergencyDoneBtn').addEventListener('click', closeEmergency); $('#emergencySwapBtn').addEventListener('click', emergencySwap);
+    $('#microSteps').addEventListener('click', e => { const step = e.target.closest('.micro-step'); if (!step) return; step.classList.toggle('done'); checkEmergencyCompletion(); });
+    $$('.theme-dot').forEach(btn => btn.addEventListener('click', () => { state.settings.theme = btn.dataset.themeValue; saveState(); renderStats(); }));
+    $$('.language-option').forEach(btn => btn.addEventListener('click', () => { if (!['en', 'de'].includes(btn.dataset.language)) return; state.settings.language = btn.dataset.language; saveState(); renderAll(); if ($('#emergencyBackdrop').classList.contains('open')) renderEmergency(); }));
+    $('#exportBtn').addEventListener('click', exportData); $('#importBtn').addEventListener('click', () => $('#importFile').click());
+    $('#importFile').addEventListener('change', e => { const file = e.target.files?.[0]; if (file) importData(file); e.target.value = ''; }); $('#resetDataBtn').addEventListener('click', resetData);
+    $('#closeTaskModalBtn').addEventListener('click', () => $('#taskModalBackdrop').classList.remove('open')); $('#cancelTaskModalBtn').addEventListener('click', () => $('#taskModalBackdrop').classList.remove('open'));
+    $('#taskForm').addEventListener('submit', e => { e.preventDefault(); createTask($('#taskTitleInput').value, $('#taskMinutesInput').value, $('#taskEnergyInput').value, $('#taskResistanceInput').value); $('#taskModalBackdrop').classList.remove('open'); });
+  }
+
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloading) { reloading = true; location.reload(); } });
+    addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register(`./sw.js?v=${BUILD}`, { updateViaCache: 'none' });
+        const update = async () => { try { await registration.update(); if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch {} };
+        await update(); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') update(); }); addEventListener('focus', update);
+      } catch {}
+    });
+  }
+
+  bindEvents(); renderAll(); setTimerMinutes(state.timer.minutes, false); saveState(); registerServiceWorker();
 })();

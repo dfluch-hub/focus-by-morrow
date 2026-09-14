@@ -1,16 +1,18 @@
 {
   "name": "FOCUS / by Morrow",
   "short_name": "FOCUS",
-  "description": "Private, low-friction focus companion for ADHD and AuDHD adults. English and German UI included.",
-  "start_url": "./index.html",
+  "description": "A private focus, brain-dump and regulation companion for ADHD and AuDHD adults.",
+  "id": "./",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#08090b",
   "theme_color": "#08090b",
   "orientation": "portrait-primary",
   "lang": "en",
-  "categories": ["productivity", "lifestyle", "utilities"],
-  "icons": [],
-  "id": "./"
+  "categories": [
+    "productivity",
+    "lifestyle",
+    "utilities"
+  ]
 }

@@ -1,163 +1,711 @@
 <!doctype html>
-<html lang="en" data-theme="midnight">
+<html lang="de" data-theme="midnight">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#08090b">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="FOCUS by Morrow — a private, low-friction focus companion for ADHD and AuDHD adults.">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FOCUS">
-  <link rel="manifest" href="./manifest.json?v=1.7.0">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icon-180.png">
-  <link rel="stylesheet" href="./styles.css?v=1.7.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#08090b" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="FOCUS / by Morrow — Low-friction momentum." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png" />
   <title>FOCUS / by Morrow</title>
+  <style>
+    :root {
+      --bg: #08090b;
+      --bg-card: rgba(255, 255, 255, 0.035);
+      --bg-elev: rgba(18, 20, 26, 0.88);
+      --bg-hover: rgba(255, 255, 255, 0.08);
+      --text: #f5f7fb;
+      --muted: #8b92a2;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-strong: rgba(255, 255, 255, 0.16);
+      --accent: #9ef4c8;
+      --accent-rgb: 158, 244, 200;
+      --danger: #ff8f9a;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    html[data-theme="violet"] { --accent: #c8b7ff; --accent-rgb: 200, 183, 255; }
+    html[data-theme="ember"] { --accent: #ffb885; --accent-rgb: 255, 184, 133; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select { font: inherit; color: inherit; border: 0; background: none; outline: 0; }
+    button { cursor: pointer; touch-action: manipulation; }
+
+    /* Layout Shell: Fester Viewport ohne Page-Scroll */
+    .app-shell {
+      height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding: max(14px, env(safe-area-inset-top)) 16px calc(76px + env(safe-area-inset-bottom));
+      position: relative;
+    }
+
+    /* Kompakte Topbar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 44px;
+      flex-shrink: 0;
+      margin-bottom: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(var(--accent-rgb), 0.18);
+      border: 1px solid rgba(var(--accent-rgb), 0.3);
+      color: var(--accent);
+      font-size: 13px;
+    }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .spark-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(var(--accent-rgb), 0.1);
+      border: 1px solid rgba(var(--accent-rgb), 0.22);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .icon-btn:active { transform: scale(0.94); }
+
+    /* Screens: Flexibel und isoliert */
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .screen.active { display: flex; }
+
+    /* --- SCREEN: HEUTE --- */
+    .capture-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 6px 6px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      flex-shrink: 0;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .capture-bar:focus-within {
+      border-color: rgba(var(--accent-rgb), 0.45);
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .capture-bar input {
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+    }
+    .capture-bar input::placeholder { color: #6b7280; }
+    .capture-submit {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #06110a;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .capture-submit:active { transform: scale(0.92); }
+
+    .meta-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .meta-pills::-webkit-scrollbar { display: none; }
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .pill.active {
+      color: var(--text);
+      background: rgba(var(--accent-rgb), 0.12);
+      border-color: rgba(var(--accent-rgb), 0.35);
+    }
+
+    /* Aufgabenliste: Scrollt nur in sich selbst */
+    .task-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .task-list-header span {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .clear-link {
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: underline;
+    }
+    .task-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .task-card {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .task-card.done {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+    .task-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .task-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .task-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .task-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .action-check {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .empty-state {
+      margin: auto;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 24px 12px;
+    }
+
+    /* --- SCREEN: ZEIT (TIMER) --- */
+    .timer-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+    .time-orbit {
+      --p: 0deg;
+      width: min(65vw, 240px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) var(--p), rgba(255, 255, 255, 0.05) 0);
+      box-shadow: 0 0 60px rgba(var(--accent-rgb), 0.1);
+      position: relative;
+    }
+    .time-orbit::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: #0d0f14;
+      border: 1px solid var(--line);
+    }
+    .timer-inner {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .timer-digits {
+      font-size: 46px;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-phase {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .timer-controls {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .duration-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 8px;
+    }
+    .btn-primary {
+      min-height: 46px;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: #06110a;
+      font-weight: 750;
+      font-size: 14px;
+      display: grid;
+      place-items: center;
+    }
+    .btn-ghost {
+      min-height: 46px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      display: grid;
+      place-items: center;
+    }
+
+    /* --- SCREEN: MENÜ (WÜRFEL / DOPAMIN) --- */
+    .segment-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+    .segment-btn {
+      padding: 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+    .segment-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+    .tab-content {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    .tab-content.active { display: flex; }
+    .dice-box {
+      margin: auto 0;
+      text-align: center;
+      padding: 24px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+    }
+    .dice-icon {
+      font-size: 32px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .dice-title {
+      font-size: 20px;
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+    .dice-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    /* --- SCREEN: ICH (EINSTELLUNGEN) --- */
+    .settings-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .setting-item {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .setting-info strong { display: block; font-size: 13px; }
+    .setting-info span { font-size: 11px; color: var(--muted); }
+    .toggle-group { display: flex; gap: 6px; }
+    .toggle-opt {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .toggle-opt.active {
+      background: rgba(var(--accent-rgb), 0.15);
+      border-color: rgba(var(--accent-rgb), 0.4);
+      color: var(--accent);
+    }
+
+    /* Untere feste Navigationsleiste */
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: min(440px, calc(100% - 24px));
+      height: 56px;
+      background: var(--bg-elev);
+      border: 1px solid var(--line-strong);
+      border-radius: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 4px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 50;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .nav-btn.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .nav-btn svg { width: 16px; height: 16px; }
+
+    /* Notfall Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: 100%;
+      max-width: 400px;
+      background: #0d0f14;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .step-item {
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: rgba(var(--accent-rgb), 0.15);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: calc(14px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translate(-50%, -20px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--bg-elev);
+      border: 1px solid var(--line-strong);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.25s var(--ease);
+      z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  </style>
 </head>
 <body>
-  <div class="ambient" aria-hidden="true"></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
   <main class="app-shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">F</div>
-        <strong>FOCUS</strong>
+        <div class="brand-mark">F</div>
+        <span>FOCUS</span>
       </div>
       <div class="top-actions">
-        <div class="header-spark" aria-live="polite">✦ <span id="sparkCount">0</span></div>
-        <button class="icon-btn" id="emergencyBtn" type="button" data-i18n-aria="aria.openEmergency" data-i18n-title="aria.emergencyMode">✦</button>
+        <div class="spark-badge">✦ <span id="sparkCount">0</span></div>
+        <button class="icon-btn" id="emergencyBtn" title="Notfallmodus">⚡</button>
       </div>
     </header>
 
-    <section id="screen-today" class="screen active" data-screen="today">
-      <div class="today-layout">
-        <form id="quickCaptureForm" class="quick-capture" autocomplete="off">
-          <input id="quickTaskInput" type="text" maxlength="120" data-i18n-placeholder="today.placeholder" data-i18n-aria="aria.newTask">
-          <button class="send-btn" type="submit" data-i18n-aria="aria.addTask" title="Add">↑</button>
-        </form>
-        <div id="taskGrid" class="task-grid" aria-live="polite"></div>
+    <!-- 1. HEUTE (TASK ZERO-SCROLL) -->
+    <section id="screen-today" class="screen active">
+      <form id="quickCaptureForm" class="capture-bar">
+        <input id="quickInput" type="text" maxlength="80" placeholder="Schleife festhalten..." autocomplete="off" required />
+        <button class="capture-submit" type="submit">＋</button>
+      </form>
+
+      <div class="meta-pills">
+        <button class="pill active" type="button" data-min="5">5m</button>
+        <button class="pill" type="button" data-min="15">15m</button>
+        <button class="pill" type="button" data-min="30">30m</button>
+        <button class="pill active" type="button" data-energy="low">⚡ Niedrig</button>
+        <button class="pill" type="button" data-energy="high">⚡ Hoch</button>
       </div>
+
+      <div class="task-list-header">
+        <span>Offene Schleifen</span>
+        <button id="clearDoneBtn" class="clear-link" type="button">Erledigte leeren</button>
+      </div>
+
+      <div id="taskList" class="task-scroll-area"></div>
     </section>
 
-    <section id="screen-time" class="screen" data-screen="time">
-      <div class="timer-only">
-        <div id="timeOrbit" class="time-orbit" data-i18n-aria="aria.visualTimer">
+    <!-- 2. ZEIT (PURISTISCHER TIMER) -->
+    <section id="screen-time" class="screen">
+      <div class="timer-center">
+        <div id="timeOrbit" class="time-orbit">
           <div class="timer-inner">
             <div id="timerDigits" class="timer-digits">15:00</div>
+            <div id="timerPhase" class="timer-phase">Fokuszeit</div>
           </div>
         </div>
         <div class="timer-controls">
           <div class="duration-row">
-            <button class="chip" data-timer-minutes="5" type="button">5</button>
-            <button class="chip active" data-timer-minutes="15" type="button">15</button>
-            <button class="chip" data-timer-minutes="25" type="button">25</button>
-            <button class="chip" data-timer-minutes="45" type="button">45</button>
+            <button class="pill" data-timer-min="2" type="button">2m</button>
+            <button class="pill" data-timer-min="5" type="button">5m</button>
+            <button class="pill active" data-timer-min="15" type="button">15m</button>
+            <button class="pill" data-timer-min="25" type="button">25m</button>
           </div>
-          <div class="timer-main-actions">
-            <button id="timerToggleBtn" class="primary-btn" type="button"></button>
-            <button id="timerResetBtn" class="ghost-btn" type="button" data-i18n="common.reset"></button>
+          <div class="btn-row">
+            <button id="timerToggleBtn" class="btn-primary" type="button">Starten</button>
+            <button id="timerResetBtn" class="btn-ghost" type="button">Reset</button>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="screen-menu" class="screen" data-screen="menu">
-      <div class="menu-shell">
-        <div class="segment-switch" role="tablist" data-i18n-aria="aria.menuMode">
-          <button class="segment-btn active" type="button" data-menu-view="dice" data-i18n="menu.taskDice"></button>
-          <button class="segment-btn" type="button" data-menu-view="dopamine" data-i18n="menu.dopamineTitle"></button>
-        </div>
+    <!-- 3. MENÜ (SEGMENT-SWITCH: WÜRFEL / DOPAMIN) -->
+    <section id="screen-menu" class="screen">
+      <div class="segment-switch">
+        <button class="segment-btn active" id="tabBtnDice" type="button">🎲 Task-Würfel</button>
+        <button class="segment-btn" id="tabBtnDopamine" type="button">⚡ Dopamin</button>
+      </div>
 
-        <div id="menuPaneDice" class="menu-pane active">
-          <article class="roulette-card">
-            <div class="roulette-stage" id="rouletteStage">
-              <div class="dice-core">
-                <div class="dice-icon" aria-hidden="true">⌁</div>
-                <h2 id="diceResult" class="dice-result"></h2>
-              </div>
-            </div>
-            <div class="roulette-actions">
-              <button id="rollBtn" class="primary-btn" type="button" data-i18n="menu.roll"></button>
-              <button id="startRolledBtn" class="ghost-btn" type="button" disabled data-i18n="menu.startIt"></button>
-            </div>
-          </article>
+      <div id="tabDice" class="tab-content active">
+        <div class="dice-box">
+          <div class="dice-icon">⌁</div>
+          <div id="diceTitle" class="dice-title">Entscheidung abgeben</div>
+          <div id="diceSub" class="dice-sub">FOCUS wählt den leichtesten Einstieg.</div>
+          <div class="btn-row" style="grid-template-columns: 1fr;">
+            <button id="rollBtn" class="btn-primary" type="button">Machbare Aufgabe würfeln</button>
+            <button id="startRolledBtn" class="btn-ghost" type="button" style="margin-top:8px; display:none;">Im Timer starten</button>
+          </div>
         </div>
+      </div>
 
-        <div id="menuPaneDopamine" class="menu-pane">
-          <div id="dopamineItems" class="dopamine-items"></div>
-        </div>
+      <div id="tabDopamine" class="tab-content">
+        <div id="dopamineList" class="task-scroll-area"></div>
       </div>
     </section>
 
-    <section id="screen-me" class="screen" data-screen="me">
-      <div class="me-shell">
-        <div class="stats-row">
-          <div class="stat-card"><strong id="sessionCount">0</strong><span data-i18n="me.sessions"></span></div>
-          <div class="stat-card"><strong id="focusMinutes">0 min</strong><span data-i18n="me.focusTime"></span></div>
-          <div class="stat-card"><strong id="meSparkCount">0</strong><span data-i18n="common.sparks"></span></div>
+    <!-- 4. ICH (EINSTELLUNGEN & STATS) -->
+    <section id="screen-me" class="screen">
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong>Sprache / Language</strong>
+            <span>Sofortiger Wechsel</span>
+          </div>
+          <div class="toggle-group">
+            <button class="toggle-opt" id="langDe" type="button">DE</button>
+            <button class="toggle-opt" id="langEn" type="button">EN</button>
+          </div>
         </div>
 
-        <article class="settings-card">
-          <div class="settings-title" data-i18n="me.preferences"></div>
-          <div class="settings-row">
-            <strong data-i18n="me.language"></strong>
-            <div class="language-toggle" role="group" data-i18n-aria="aria.languageChoice">
-              <button class="language-option" type="button" data-language="en">EN</button>
-              <button class="language-option" type="button" data-language="de">DE</button>
-            </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong>Akzentfarbe</strong>
+            <span>Subtile Stimmung</span>
           </div>
-          <div class="settings-row">
-            <strong data-i18n="me.accent"></strong>
-            <div class="theme-options" data-i18n-aria="aria.chooseTheme">
-              <button class="theme-dot" type="button" data-theme-value="midnight" data-i18n-aria="aria.mintTheme"></button>
-              <button class="theme-dot" type="button" data-theme-value="violet" data-i18n-aria="aria.violetTheme"></button>
-              <button class="theme-dot" type="button" data-theme-value="ember" data-i18n-aria="aria.emberTheme"></button>
-            </div>
+          <div class="toggle-group">
+            <button class="pill active" data-theme="midnight" type="button">Mint</button>
+            <button class="pill" data-theme="violet" type="button">Violet</button>
+            <button class="pill" data-theme="ember" type="button">Ember</button>
           </div>
-          <div class="settings-row">
-            <strong data-i18n="me.dataHere"></strong>
-            <button id="exportBtn" class="ghost-btn compact-btn" type="button" data-i18n="common.export"></button>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong>Gesamte Fokuszeit</strong>
+            <span id="statFocusTime">0 Minuten</span>
           </div>
-          <div class="settings-row">
-            <strong data-i18n="me.restore"></strong>
-            <button id="importBtn" class="ghost-btn compact-btn" type="button" data-i18n="common.import"></button>
-            <input id="importFile" type="file" accept="application/json" hidden>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong>Daten verwalten</strong>
+            <span>Lokales Backup</span>
           </div>
-          <div class="settings-row">
-            <strong data-i18n="me.resetData"></strong>
-            <button id="resetDataBtn" class="danger-btn compact-btn" type="button" data-i18n="common.reset"></button>
+          <div class="toggle-group">
+            <button class="pill" id="exportBtn" type="button">Export</button>
+            <button class="pill" id="resetBtn" type="button" style="color:var(--danger)">Reset</button>
           </div>
-        </article>
+        </div>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" data-i18n-aria="aria.mainNavigation">
-    <button class="nav-btn active" data-nav="today" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"/></svg><span data-i18n="nav.today"></span></button>
-    <button class="nav-btn" data-nav="time" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg><span data-i18n="nav.time"></span></button>
-    <button class="nav-btn" data-nav="menu" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 7h14M5 12h14M5 17h14"/></svg><span data-i18n="nav.menu"></span></button>
-    <button class="nav-btn" data-nav="me" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3"/><path d="M5.5 19c1.4-3.2 3.6-4.8 6.5-4.8s5.1 1.6 6.5 4.8"/></svg><span data-i18n="nav.me"></span></button>
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-nav="today" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12h16M12 4v16"/></svg>
+      <span>Heute</span>
+    </button>
+    <button class="nav-btn" data-nav="time" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>
+      <span>Zeit</span>
+    </button>
+    <button class="nav-btn" data-nav="menu" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+      <span>Menü</span>
+    </button>
+    <button class="nav-btn" data-nav="me" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="3"/><path d="M5.5 19c1.4-3.2 3.6-4.8 6.5-4.8s5.1 1.6 6.5 4.8"/></svg>
+      <span>Ich</span>
+    </button>
   </nav>
 
-  <div id="emergencyBackdrop" class="emergency-backdrop" role="dialog" aria-modal="true" aria-labelledby="emergencyTitle">
-    <div class="emergency-shell">
-      <div class="emergency-top">
-        <div class="emergency-brand" data-i18n="emergency.brand"></div>
-        <button id="closeEmergencyBtn" class="icon-btn" type="button" data-i18n-aria="aria.closeEmergency">×</button>
-      </div>
-      <div class="emergency-center">
-        <h2 id="emergencyTitle" class="emergency-title"></h2>
-        <div id="microSteps" class="micro-steps"></div>
-      </div>
-      <div class="emergency-bottom">
-        <button id="emergencyDoneBtn" class="primary-btn" type="button" data-i18n="emergency.enough"></button>
-        <button id="emergencySwapBtn" class="ghost-btn" type="button" data-i18n="emergency.another"></button>
-      </div>
+  <!-- Emergency Modal -->
+  <div id="emergencyModal" class="modal-backdrop">
+    <div class="modal">
+      <div style="font-size:16px; font-weight:800;">Nur 60 Sekunden.</div>
+      <div id="emergencySteps" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <button id="emergencyCloseBtn" class="btn-primary" type="button">Fertig (+1 Spark)</button>
     </div>
   </div>
 
-  <script src="./app.js?v=1.7.0" defer></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>

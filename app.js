@@ -1,382 +1,84 @@
 (() => {
-  'use strict';
+'use strict';
 
-  const STORAGE_KEY = 'morrow.focus.v2';
-  const DEFAULT_STATE = {
-    lang: 'de',
-    theme: 'midnight',
-    sparks: 0,
-    tasks: [],
-    focusMinutes: 0,
-    timerMin: 15
-  };
+const KEY='morrow.focus.v2', BUILD='2.0.0';
+const I={
+de:{
+'nav.focus':'FOKUS','nav.collect':'SAMMELN','nav.reset':'RESET','focus.draw':'Zufällige Aufgabe ziehen','focus.new':'Neue Aufgabe anlegen','focus.break':'Zu schwer? In 60s teilen','focus.done':'Erledigt (+1 Spark)','focus.skip':'Überspringen','timer.start':'Start','timer.pause':'Pause','timer.resume':'Weiter','timer.reset':'Reset','timer.flow':'Im Flow bleiben (+15m)','timer.complete':'Erledigt (+1 Spark)','collect.placeholder':'Was geht dir durch den Kopf?','collect.openLoops':'Offene Schleifen','collect.clearDone':'Erledigte leeren','collect.empty':'Noch keine offenen Schleifen.','energy.low':'Niedrig','energy.medium':'Mittel','energy.high':'Hoch','reset.song':'1-Song-Reset','reset.songSub':'3 Minuten Abstand','reset.breathe':'4-7-8 Atem-Kreis','reset.breatheSub':'Nervensystem beruhigen','reset.cold':'Kältereiz','reset.coldSub':'30 Sekunden','reset.move':'Körper-Impuls','reset.moveSub':'Bewegung / Ortswechsel','reset.back':'Zurück','reset.stop':'Stop','reset.next':'Neuer Impuls','reset.inhale':'Einatmen','reset.hold':'Halten','reset.exhale':'Ausatmen','move.1':'Steh auf und geh einmal in einen anderen Raum.','move.2':'Schultern kreisen, Arme ausschütteln, dann 10 Schritte gehen.','move.3':'Wechsle für 5 Minuten den Sitzplatz.','move.4':'Öffne ein Fenster oder geh kurz vor die Tür.','move.5':'Hol dir Wasser und trink drei bewusste Schlucke.','settings.title':'Einstellungen','settings.language':'Sprache','settings.theme':'Akzent','settings.sparks':'Sparks','settings.focusTime':'Fokuszeit','settings.export':'JSON exportieren','settings.resetData':'Daten löschen','theme.mint':'Mint','theme.violet':'Violet','theme.ember':'Ember','micro.1':'Bereite „{task}“ sichtbar vor.','micro.2':'Starte genau 60 Sekunden mit der ersten sichtbaren Teilhandlung.','micro.3':'Entscheide danach: weiter oder ohne Schuldgefühl stoppen.','toast.added':'Gespeichert.','toast.active':'Aufgabe aktiviert.','toast.done':'+1 Spark','toast.skipped':'Für diese Session nach hinten geschoben.','toast.exported':'Backup exportiert.','toast.cleared':'Erledigte Aufgaben entfernt.','toast.reset':'Lokale Daten gelöscht.','confirm.reset':'Alle lokalen Aufgaben, Sparks und Fokusdaten löschen?','aria.settings':'Einstellungen öffnen','aria.close':'Schließen','aria.navigation':'Hauptnavigation','aria.capture':'Gedanken erfassen','aria.add':'Hinzufügen','aria.delete':'Aufgabe löschen','aria.complete':'Aufgabe abhaken','new.prompt':'Neue Aufgabe'
+},
+en:{
+'nav.focus':'FOCUS','nav.collect':'COLLECT','nav.reset':'RESET','focus.draw':'Draw a random task','focus.new':'Create a new task','focus.break':'Too hard? Break into 60s','focus.done':'Done (+1 Spark)','focus.skip':'Skip','timer.start':'Start','timer.pause':'Pause','timer.resume':'Resume','timer.reset':'Reset','timer.flow':'Stay in flow (+15m)','timer.complete':'Done (+1 Spark)','collect.placeholder':'What is on your mind?','collect.openLoops':'Open loops','collect.clearDone':'Clear completed','collect.empty':'No open loops yet.','energy.low':'Low','energy.medium':'Medium','energy.high':'High','reset.song':'1-song reset','reset.songSub':'3 minutes away','reset.breathe':'4-7-8 breathing','reset.breatheSub':'Regulate your nervous system','reset.cold':'Cold cue','reset.coldSub':'30 seconds','reset.move':'Body cue','reset.moveSub':'Movement / location shift','reset.back':'Back','reset.stop':'Stop','reset.next':'New cue','reset.inhale':'Inhale','reset.hold':'Hold','reset.exhale':'Exhale','move.1':'Stand up and walk into another room once.','move.2':'Roll your shoulders, shake out your arms, then walk 10 steps.','move.3':'Change your seat for 5 minutes.','move.4':'Open a window or step outside briefly.','move.5':'Get water and take three deliberate sips.','settings.title':'Settings','settings.language':'Language','settings.theme':'Accent','settings.sparks':'Sparks','settings.focusTime':'Focus time','settings.export':'Export JSON','settings.resetData':'Delete data','theme.mint':'Mint','theme.violet':'Violet','theme.ember':'Ember','micro.1':'Put “{task}” visibly in front of you.','micro.2':'Start the first visible action for exactly 60 seconds.','micro.3':'Then choose: continue or stop without guilt.','toast.added':'Saved.','toast.active':'Task activated.','toast.done':'+1 Spark','toast.skipped':'Moved back for this session.','toast.exported':'Backup exported.','toast.cleared':'Completed tasks cleared.','toast.reset':'Local data deleted.','confirm.reset':'Delete all local tasks, Sparks and focus data?','aria.settings':'Open settings','aria.close':'Close','aria.navigation':'Main navigation','aria.capture':'Capture a thought','aria.add':'Add','aria.delete':'Delete task','aria.complete':'Complete task','new.prompt':'New task'
+}};
+const DEF={tasks:[],completed:[],activeId:null,sparks:0,totalFocusMs:0,language:null,theme:'mint',timerMinutes:15,sessionSkipOrder:[]};
+let state=load(),screen='focus',captureMinutes=15,microOpen=false,audioCtx=null,resetSession=null;
+let timer={running:false,expired:false,durationMs:state.timerMinutes*60000,remainingMs:state.timerMinutes*60000,endAt:0,segmentStartedAt:0,interval:null};
 
-  const i18n = {
-    de: {
-      placeholder: 'Schleife festhalten...',
-      empty: 'Keine offenen Schleifen. Dein Kopf ist frei.',
-      timeLabel: 'Fokuszeit',
-      start: 'Starten',
-      pause: 'Pause',
-      resume: 'Weiter',
-      doneToast: 'Erledigt. +1 Spark.',
-      chimeStart: 'Timer läuft.',
-      diceEmpty: 'Keine offenen Aufgaben.',
-      diceSub: 'Leichtester Einstieg:',
-      rolledBtn: 'In Timer übernehmen'
-    },
-    en: {
-      placeholder: 'Capture a loop...',
-      empty: 'No open loops. Your mind is clear.',
-      timeLabel: 'Focus block',
-      start: 'Start',
-      pause: 'Pause',
-      resume: 'Resume',
-      doneToast: 'Done. +1 spark.',
-      chimeStart: 'Timer started.',
-      diceEmpty: 'No tasks to roll.',
-      diceSub: 'Lowest friction move:',
-      rolledBtn: 'Start in Timer'
-    }
-  };
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const browserLang=()=>navigator.language?.toLowerCase().startsWith('de')?'de':'en';
+function load(){try{const p=JSON.parse(localStorage.getItem(KEY)||'{}'),s={...structuredClone(DEF),...p};s.tasks=Array.isArray(s.tasks)?s.tasks:[];s.completed=Array.isArray(s.completed)?s.completed:[];s.sessionSkipOrder=Array.isArray(s.sessionSkipOrder)?s.sessionSkipOrder:[];if(!['de','en'].includes(s.language))s.language=browserLang();if(!['mint','violet','ember'].includes(s.theme))s.theme='mint';return s}catch{return {...structuredClone(DEF),language:browserLang()}}}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state)),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function t(k,v={}){let s=I[state.language]?.[k]??I.en[k]??k;for(const [a,b] of Object.entries(v))s=s.replaceAll(`{${a}}`,String(b));return s}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const activeTask=()=>state.tasks.find(x=>x.id===state.activeId)||null;
+function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('show');clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove('show'),1800)}
+function applyI18n(){document.documentElement.lang=state.language;$$('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));$$('[data-i18n-placeholder]').forEach(e=>e.placeholder=t(e.dataset.i18nPlaceholder));$$('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)));$$('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.language===state.language))}
+function applyTheme(){document.documentElement.dataset.theme=state.theme;$$('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===state.theme))}
+function navigate(n){screen=n;$$('.screen').forEach(e=>e.classList.toggle('active',e.dataset.screen===n));$$('.nav').forEach(e=>e.classList.toggle('active',e.dataset.nav===n));if(n==='reset')renderResetHome()}
+function addTask(title,minutes=15,energy='medium',activate=false){title=String(title).trim();if(!title)return;const x={id:uid(),title,minutes:+minutes,energy,createdAt:new Date().toISOString()};state.tasks.push(x);if(activate)state.activeId=x.id;save();renderAll();if(activate)navigate('focus');toast(t('toast.added'))}
+function chooseNovel(){if(!state.tasks.length)return null;const recent=new Set(state.sessionSkipOrder.slice(-Math.max(1,state.tasks.length-1)));let pool=state.tasks.filter(x=>x.id!==state.activeId&&!recent.has(x.id));if(!pool.length)pool=state.tasks.filter(x=>x.id!==state.activeId);if(!pool.length)pool=[...state.tasks];return pool[Math.floor(Math.random()*pool.length)]||null}
+function drawTask(){stopTimer(true);const x=chooseNovel();if(!x)return;state.activeId=x.id;microOpen=false;state.timerMinutes=x.minutes||15;resetTimer(false);save();renderAll();navigate('focus')}
+function activateTask(id){stopTimer(true);const x=state.tasks.find(t=>t.id===id);if(!x)return;state.activeId=id;state.timerMinutes=x.minutes||15;state.sessionSkipOrder=state.sessionSkipOrder.filter(v=>v!==id);microOpen=false;resetTimer(false);save();renderAll();navigate('focus');toast(t('toast.active'))}
+function skipTask(){const x=activeTask();if(!x)return;stopTimer(true);state.sessionSkipOrder.push(x.id);state.activeId=null;microOpen=false;resetTimer(false);const n=chooseNovel();if(n)state.activeId=n.id;save();renderAll();toast(t('toast.skipped'))}
+function completeTask(id,full=true){const x=state.tasks.find(t=>t.id===id);if(!x)return;if(id===state.activeId)stopTimer(true);state.tasks=state.tasks.filter(t=>t.id!==id);state.completed.unshift({...x,completedAt:new Date().toISOString()});state.sparks++;state.sessionSkipOrder=state.sessionSkipOrder.filter(v=>v!==id);if(id===state.activeId){state.activeId=null;microOpen=false;resetTimer(false);const n=chooseNovel();if(n)state.activeId=n.id}save();full?reward():vibrate();renderAll();toast(t('toast.done'))}
+function deleteTask(id){if(id===state.activeId){stopTimer(true);state.activeId=null;resetTimer(false)}state.tasks=state.tasks.filter(x=>x.id!==id);save();renderAll()}
+function clearCompleted(){if(!state.completed.length)return;state.completed=[];save();renderCollect();toast(t('toast.cleared'))}
+function microSteps(x){return x?[t('micro.1',{task:x.title}),t('micro.2'),t('micro.3')]:[]}
 
-  const dopamineList = [
-    { title: 'One-Song Reset', note: '1 Song hören, erst bei Minute 2 anfangen.' },
-    { title: 'Kältereiz', note: '20 Sek. kaltes Wasser über die Handgelenke.' },
-    { title: 'Ortswechsel', note: 'Aufstehen, Raum oder Sitzposition wechseln.' },
-    { title: 'Sichtbarer Genuss', note: 'Wasser oder Tee direkt neben die Aufgabe stellen.' }
-  ];
+function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+function stopTimer(acc){if(!timer.running){clearInterval(timer.interval);timer.interval=null;return}const now=Date.now();if(acc)state.totalFocusMs+=Math.max(0,now-timer.segmentStartedAt);timer.remainingMs=Math.max(0,timer.endAt-now);timer.running=false;timer.endAt=0;timer.segmentStartedAt=0;clearInterval(timer.interval);timer.interval=null;save()}
+function resetTimer(render=true){clearInterval(timer.interval);timer={running:false,expired:false,durationMs:state.timerMinutes*60000,remainingMs:state.timerMinutes*60000,endAt:0,segmentStartedAt:0,interval:null};if(render)renderFocus()}
+function setMinutes(m){stopTimer(true);state.timerMinutes=+m;timer.durationMs=timer.remainingMs=+m*60000;timer.expired=false;save();renderFocus()}
+function startPause(){if(timer.running){stopTimer(true);updateTimerDOM();return}if(timer.expired)return;primeAudio();timer.running=true;timer.segmentStartedAt=Date.now();timer.endAt=Date.now()+timer.remainingMs;timer.interval=setInterval(tick,250);updateTimerDOM()}
+function tick(){if(!timer.running)return;timer.remainingMs=Math.max(0,timer.endAt-Date.now());updateTimerDOM();if(timer.remainingMs<=0)expireTimer()}
+function expireTimer(){if(timer.running)state.totalFocusMs+=Math.max(0,Date.now()-timer.segmentStartedAt);timer.running=false;timer.expired=true;timer.remainingMs=0;timer.endAt=0;timer.segmentStartedAt=0;clearInterval(timer.interval);timer.interval=null;save();chime();vibrate();renderFocus();updateSettings()}
+function addFlow(){timer.expired=false;timer.durationMs=timer.remainingMs=15*60000;renderFocus();startPause()}
+function updateTimerDOM(){const o=$('#orbit'),d=$('#orbitTime'),b=$('#timerToggle');if(!o||!d)return;d.textContent=fmt(timer.remainingMs);const r=timer.durationMs?Math.min(1,(timer.durationMs-timer.remainingMs)/timer.durationMs):0;o.style.setProperty('--p',`${r*360}deg`);if(b)b.textContent=timer.running?t('timer.pause'):(timer.remainingMs<timer.durationMs?t('timer.resume'):t('timer.start'))}
 
-  let state = loadState();
-  let quickMin = 5;
-  let quickEnergy = 'low';
-  let timerInterval = null;
-  let timerRemainingMs = state.timerMin * 60 * 1000;
-  let timerDurationMs = timerRemainingMs;
-  let timerRunning = false;
-  let lastRolledTask = null;
+function renderFocus(){const root=$('#focusStage'),x=activeTask();$('#sparkCount').textContent=state.sparks;if(!x){root.innerHTML=`<div class="focus-card glass"><div class="focus-empty"><div class="focus-empty-actions"><button id="drawBtn" class="primary" type="button">${esc(t('focus.draw'))}</button><button id="newTaskBtn" class="ghost" type="button">${esc(t('focus.new'))}</button></div></div></div>`;return}
+if(timer.expired){root.innerHTML=`<div class="focus-card glass"><div class="active-task"><h1 class="active-title">${esc(x.title)}</h1><div class="expired"><button id="flowBtn" class="primary" type="button">${esc(t('timer.flow'))}</button><button id="completeExpiredBtn" class="ghost" type="button">${esc(t('timer.complete'))}</button></div></div></div>`;return}
+const micro=microOpen?`<div class="micro-inline">${microSteps(x).map((s,i)=>`<div class="micro"><b>${i+1}</b><span>${esc(s)}</span></div>`).join('')}</div>`:'';
+root.innerHTML=`<div class="focus-card glass"><div class="active-task"><h1 class="active-title">${esc(x.title)}</h1>${micro}<div class="timer-zone"><div id="orbit" class="orbit"><div id="orbitTime" class="orbit-time">${fmt(timer.remainingMs)}</div></div><div class="duration">${[5,15,25,45].map(m=>`<button type="button" class="pill ${state.timerMinutes===m?'active':''}" data-focus-minutes="${m}">${m}m</button>`).join('')}</div><div class="timer-buttons"><button id="timerToggle" class="primary" type="button"></button><button id="timerReset" class="ghost" type="button">${esc(t('timer.reset'))}</button></div></div><div class="focus-actions"><button id="breakBtn" class="subtle breakdown" type="button">${esc(t('focus.break'))}</button><button id="completeBtn" class="primary" type="button">${esc(t('focus.done'))}</button><button id="skipBtn" class="ghost" type="button">${esc(t('focus.skip'))}</button></div></div></div>`;updateTimerDOM()}
+function renderCollect(){const l=$('#taskList');l.innerHTML=state.tasks.length?state.tasks.map(x=>`<article class="task-row"><button class="task-main" type="button" data-activate="${x.id}"><strong>${esc(x.title)}</strong><div class="meta"><span class="badge">${x.minutes}m</span><span class="badge">${esc(t('energy.'+x.energy))}</span></div></button><button class="row-btn" type="button" data-complete="${x.id}" aria-label="${esc(t('aria.complete'))}">✓</button><button class="row-btn" type="button" data-delete="${x.id}" aria-label="${esc(t('aria.delete'))}">×</button></article>`).join(''):`<div class="list-empty">${esc(t('collect.empty'))}</div>`;$$('#captureDuration .pill').forEach(b=>b.classList.toggle('active',+b.dataset.captureMinutes===captureMinutes))}
 
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => [...document.querySelectorAll(sel)];
+function renderResetHome(){cancelReset();const r=$('#resetRoot');r.className='reset-grid';r.innerHTML=[['song','reset.song','reset.songSub','♫'],['breathe','reset.breathe','reset.breatheSub','◯'],['cold','reset.cold','reset.coldSub','❄'],['move','reset.move','reset.moveSub','↗']].map(([m,a,b,i])=>`<button class="reset-card" type="button" data-reset-mode="${m}"><strong>${i} ${esc(t(a))}</strong><span>${esc(t(b))}</span></button>`).join('')}
+function startReset(m){cancelReset();const r=$('#resetRoot');r.className='reset-session';if(m==='song')countdown(r,180,'♫',t('reset.song'));if(m==='cold')countdown(r,30,'❄',t('reset.cold'));if(m==='breathe')breathing(r);if(m==='move')move(r)}
+function countdown(r,s,icon,label){let left=s;r.innerHTML=`<div class="reset-panel glass"><div style="font-size:34px">${icon}</div><div class="reset-label">${esc(label)}</div><div id="resetTimer" class="reset-timer">${fmt(left*1000)}</div><div class="reset-actions"><button id="resetBack" class="ghost" type="button">${esc(t('reset.back'))}</button><button id="resetStop" class="primary" type="button">${esc(t('reset.stop'))}</button></div></div>`;const interval=setInterval(()=>{left--;const e=$('#resetTimer');if(e)e.textContent=fmt(left*1000);if(left<=0){clearInterval(interval);chime();vibrate()}},1000);resetSession={interval}}
+function breathing(r){const p=[['reset.inhale',4,'inhale'],['reset.hold',7,'hold'],['reset.exhale',8,'exhale']];let n=0,left=p[0][1];r.innerHTML=`<div class="reset-panel glass"><div id="breathCircle" class="breath-circle"></div><div id="breathLabel" class="reset-label"></div><div id="breathTime" class="reset-timer"></div><button id="resetBack" class="ghost" type="button">${esc(t('reset.back'))}</button></div>`;const paint=()=>{const x=p[n];$('#breathCircle').className='breath-circle '+x[2];$('#breathLabel').textContent=t(x[0]);$('#breathTime').textContent=left};paint();const interval=setInterval(()=>{left--;if(left<=0){n=(n+1)%p.length;left=p[n][1]}paint()},1000);resetSession={interval}}
+function move(r){const draw=()=>t('move.'+(1+Math.floor(Math.random()*5)));r.innerHTML=`<div class="reset-panel glass"><div id="moveText" class="move-text">${esc(draw())}</div><div class="reset-actions"><button id="resetBack" class="ghost" type="button">${esc(t('reset.back'))}</button><button id="moveNext" class="primary" type="button">${esc(t('reset.next'))}</button></div></div>`;$('#moveNext').addEventListener('click',()=>$('#moveText').textContent=draw())}
+function cancelReset(){if(resetSession?.interval)clearInterval(resetSession.interval);resetSession=null}
 
-  // Multisensorisches Feedback (Web Audio API - 528Hz Sinus Gong)
-  function playTone(freq = 528) {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.65);
-      if ('vibrate' in navigator) navigator.vibrate(35);
-    } catch {}
-  }
+function primeAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;audioCtx??=new C();if(audioCtx.state==='suspended')audioCtx.resume()}catch{}}
+function chime(){try{primeAudio();if(!audioCtx)return;const n=audioCtx.currentTime,o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(528,n);g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.08,n+.06);g.gain.exponentialRampToValueAtTime(.0001,n+.8);o.connect(g).connect(audioCtx.destination);o.start(n);o.stop(n+.82)}catch{}}
+function vibrate(){try{navigator.vibrate?.([28,22,42])}catch{}}
+function confetti(){const l=$('#fx');for(let i=0;i<18;i++){const p=document.createElement('span');p.className='confetti';const a=Math.PI*2*i/18+Math.random()*.25,d=55+Math.random()*120;p.style.setProperty('--x',`${Math.cos(a)*d}px`);p.style.setProperty('--y',`${Math.sin(a)*d}px`);p.style.setProperty('--r',`${180+Math.random()*300}deg`);l.appendChild(p);setTimeout(()=>p.remove(),900)}}
+const reward=()=>{vibrate();chime();confetti()};
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? { ...DEFAULT_STATE, ...JSON.parse(raw) } : structuredClone(DEFAULT_STATE);
-    } catch {
-      return structuredClone(DEFAULT_STATE);
-    }
-  }
+function updateSettings(){$('#settingsSparks').textContent=`✦ ${state.sparks}`;$('#settingsFocusTime').textContent=`${Math.round(state.totalFocusMs/60000)} min`;$$('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.language===state.language));$$('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.theme===state.theme))}
+function renderAll(){applyI18n();applyTheme();renderFocus();renderCollect();updateSettings();$('#sparkCount').textContent=state.sparks}
+function exportJSON(){const blob=new Blob([JSON.stringify({product:'FOCUS / by Morrow',version:2,exportedAt:new Date().toISOString(),data:state},null,2)],{type:'application/json'}),a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download=`focus-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),500);toast(t('toast.exported'))}
+function resetData(){if(!confirm(t('confirm.reset')))return;localStorage.removeItem(KEY);state={...structuredClone(DEF),language:browserLang()};resetTimer(false);save();renderAll();$('#settingsModal').classList.remove('open');toast(t('toast.reset'))}
+function newPrompt(){const x=prompt(t('new.prompt'),'');if(x?.trim())addTask(x,15,'medium',true)}
 
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  function showToast(msg) {
-    const t = $('#toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => t.classList.remove('show'), 2000);
-  }
-
-  function renderTasks() {
-    const list = $('#taskList');
-    const t = i18n[state.lang];
-    if (!state.tasks.length) {
-      list.innerHTML = `<div class="empty-state">${t.empty}</div>`;
-      return;
-    }
-    list.innerHTML = state.tasks
-      .map(
-        task => `
-        <div class="task-card ${task.done ? 'done' : ''}" data-id="${task.id}">
-          <div class="task-info">
-            <div class="task-title">${task.title}</div>
-            <div class="task-sub">${task.min}m · ${task.energy}</div>
-          </div>
-          <div class="task-actions">
-            <button class="action-check" data-action="toggle">${task.done ? 'Undo' : 'Done'}</button>
-            <button class="icon-btn" data-action="del" style="width:28px;height:28px;">×</button>
-          </div>
-        </div>`
-      )
-      .join('');
-  }
-
-  function renderDopamine() {
-    $('#dopamineList').innerHTML = dopamineList
-      .map(
-        d => `
-        <div class="task-card" style="cursor:pointer" onclick="playTone(600)">
-          <div>
-            <div class="task-title">${d.title}</div>
-            <div class="task-sub">${d.note}</div>
-          </div>
-        </div>`
-      )
-      .join('');
-  }
-
-  function updateTimerUI() {
-    const sec = Math.ceil(timerRemainingMs / 1000);
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    $('#timerDigits').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    const ratio = timerDurationMs ? (timerDurationMs - timerRemainingMs) / timerDurationMs : 0;
-    $('#timeOrbit').style.setProperty('--p', `${ratio * 360}deg`);
-    $('#timerToggleBtn').textContent = timerRunning
-      ? i18n[state.lang].pause
-      : timerRemainingMs < timerDurationMs
-        ? i18n[state.lang].resume
-        : i18n[state.lang].start;
-  }
-
-  function startTimer() {
-    if (timerRunning) return;
-    timerRunning = true;
-    playTone(440);
-    const start = Date.now() - (timerDurationMs - timerRemainingMs);
-    timerInterval = setInterval(() => {
-      timerRemainingMs = Math.max(0, timerDurationMs - (Date.now() - start));
-      updateTimerUI();
-      if (timerRemainingMs <= 0) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        state.focusMinutes += state.timerMin;
-        state.sparks += 1;
-        saveState();
-        playTone(528);
-        showToast('+1 Spark! Fokusblock beendet.');
-        renderAll();
-      }
-    }, 250);
-    updateTimerUI();
-  }
-
-  function pauseTimer() {
-    timerRunning = false;
-    clearInterval(timerInterval);
-    updateTimerUI();
-  }
-
-  function resetTimer() {
-    pauseTimer();
-    timerRemainingMs = state.timerMin * 60 * 1000;
-    timerDurationMs = timerRemainingMs;
-    updateTimerUI();
-  }
-
-  function setTimerMin(min) {
-    pauseTimer();
-    state.timerMin = min;
-    timerDurationMs = min * 60 * 1000;
-    timerRemainingMs = timerDurationMs;
-    saveState();
-    $$('[data-timer-min]').forEach(b => b.classList.toggle('active', Number(b.dataset.timerMin) === min));
-    updateTimerUI();
-  }
-
-  function renderAll() {
-    document.documentElement.dataset.theme = state.theme;
-    $('#sparkCount').textContent = state.sparks;
-    $('#statFocusTime').textContent = `${state.focusMinutes} Min`;
-    $('#quickInput').placeholder = i18n[state.lang].placeholder;
-    $('#langDe').classList.toggle('active', state.lang === 'de');
-    $('#langEn').classList.toggle('active', state.lang === 'en');
-    renderTasks();
-    renderDopamine();
-    updateTimerUI();
-  }
-
-  function bindEvents() {
-    // Nav
-    $$('.nav-btn').forEach(b =>
-      b.addEventListener('click', () => {
-        $$('.nav-btn').forEach(x => x.classList.remove('active'));
-        $$('.screen').forEach(s => s.classList.remove('active'));
-        b.classList.add('active');
-        $(`#screen-${b.dataset.nav}`).classList.add('active');
-      })
-    );
-
-    // Quick Capture
-    $('#quickCaptureForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const input = $('#quickInput');
-      const val = input.value.trim();
-      if (!val) return;
-      state.tasks.unshift({
-        id: Date.now().toString(36),
-        title: val,
-        min: quickMin,
-        energy: quickEnergy,
-        done: false
-      });
-      input.value = '';
-      saveState();
-      renderTasks();
-      playTone(650);
-    });
-
-    // Pills
-    $$('.meta-pills .pill').forEach(p =>
-      p.addEventListener('click', () => {
-        if (p.dataset.min) {
-          quickMin = Number(p.dataset.min);
-          $$('[data-min]').forEach(x => x.classList.remove('active'));
-          p.classList.add('active');
-        }
-        if (p.dataset.energy) {
-          quickEnergy = p.dataset.energy;
-          $$('[data-energy]').forEach(x => x.classList.remove('active'));
-          p.classList.add('active');
-        }
-      })
-    );
-
-    // Task Actions
-    $('#taskList').addEventListener('click', e => {
-      const card = e.target.closest('[data-id]');
-      if (!card) return;
-      const id = card.dataset.id;
-      const act = e.target.dataset.action;
-      if (act === 'toggle') {
-        const t = state.tasks.find(x => x.id === id);
-        t.done = !t.done;
-        if (t.done) {
-          state.sparks += 1;
-          playTone(528);
-          showToast(i18n[state.lang].doneToast);
-        }
-        saveState();
-        renderAll();
-      }
-      if (act === 'del') {
-        state.tasks = state.tasks.filter(x => x.id !== id);
-        saveState();
-        renderTasks();
-      }
-    });
-
-    $('#clearDoneBtn').addEventListener('click', () => {
-      state.tasks = state.tasks.filter(t => !t.done);
-      saveState();
-      renderTasks();
-    });
-
-    // Timer Controls
-    $$('[data-timer-min]').forEach(b =>
-      b.addEventListener('click', () => setTimerMin(Number(b.dataset.timerMin)))
-    );
-    $('#timerToggleBtn').addEventListener('click', () => (timerRunning ? pauseTimer() : startTimer()));
-    $('#timerResetBtn').addEventListener('click', resetTimer);
-
-    // Menu Segment
-    $('#tabBtnDice').addEventListener('click', () => {
-      $('#tabBtnDice').classList.add('active');
-      $('#tabBtnDopamine').classList.remove('active');
-      $('#tabDice').classList.add('active');
-      $('#tabDopamine').classList.remove('active');
-    });
-    $('#tabBtnDopamine').addEventListener('click', () => {
-      $('#tabBtnDopamine').classList.add('active');
-      $('#tabBtnDice').classList.remove('active');
-      $('#tabDopamine').classList.add('active');
-      $('#tabDice').classList.remove('active');
-    });
-
-    // Dice Roll
-    $('#rollBtn').addEventListener('click', () => {
-      const open = state.tasks.filter(t => !t.done);
-      if (!open.length) {
-        $('#diceTitle').textContent = i18n[state.lang].diceEmpty;
-        return;
-      }
-      playTone(400);
-      lastRolledTask = open[Math.floor(Math.random() * open.length)];
-      $('#diceTitle').textContent = lastRolledTask.title;
-      $('#diceSub').textContent = `${lastRolledTask.min} Min · ${lastRolledTask.energy}`;
-      const sBtn = $('#startRolledBtn');
-      sBtn.style.display = 'block';
-      sBtn.textContent = i18n[state.lang].rolledBtn;
-    });
-
-    $('#startRolledBtn').addEventListener('click', () => {
-      if (lastRolledTask) {
-        setTimerMin(lastRolledTask.min);
-        $('[data-nav="time"]').click();
-        startTimer();
-      }
-    });
-
-    // Notfall
-    $('#emergencyBtn').addEventListener('click', () => {
-      const open = state.tasks.filter(t => !t.done);
-      const title = open.length ? open[0].title : 'dieser Aufgabe';
-      $('#emergencySteps').innerHTML = `
-        <div class="step-item"><span class="step-num">1</span>Öffne nur: "${title}".</div>
-        <div class="step-item"><span class="step-num">2</span>Arbeite genau 60 Sekunden daran.</div>
-        <div class="step-item"><span class="step-num">3</span>Danach entscheidest du: Stopp oder Weiter.</div>
-      `;
-      $('#emergencyModal').classList.add('open');
-    });
-    $('#emergencyCloseBtn').addEventListener('click', () => {
-      state.sparks += 1;
-      saveState();
-      playTone(528);
-      $('#emergencyModal').classList.remove('open');
-      renderAll();
-    });
-
-    // Settings
-    $('#langDe').addEventListener('click', () => { state.lang = 'de'; saveState(); renderAll(); });
-    $('#langEn').addEventListener('click', () => { state.lang = 'en'; saveState(); renderAll(); });
-    $$('[data-theme]').forEach(b =>
-      b.addEventListener('click', () => {
-        state.theme = b.dataset.theme;
-        saveState();
-        renderAll();
-      })
-    );
-    $('#exportBtn').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'focus-backup.json';
-      a.click();
-    });
-    $('#resetBtn').addEventListener('click', () => {
-      if (confirm('Wirklich alles löschen?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        state = structuredClone(DEFAULT_STATE);
-        renderAll();
-      }
-    });
-  }
-
-  function init() {
-    bindEvents();
-    renderAll();
-  }
-  init();
+function bind(){
+$$('.nav').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.nav)));
+$('#settingsBtn').addEventListener('click',()=>{$('#settingsModal').classList.add('open');updateSettings()});$('#closeSettingsBtn').addEventListener('click',()=>$('#settingsModal').classList.remove('open'));$('#settingsModal').addEventListener('click',e=>{if(e.target.id==='settingsModal')e.currentTarget.classList.remove('open')});
+$$('.lang-btn').forEach(b=>b.addEventListener('click',()=>{state.language=b.dataset.language;save();renderAll();if(screen==='reset')renderResetHome()}));$$('.theme-btn').forEach(b=>b.addEventListener('click',()=>{state.theme=b.dataset.theme;save();renderAll()}));
+$('#exportBtn').addEventListener('click',exportJSON);$('#resetDataBtn').addEventListener('click',resetData);
+$('#captureForm').addEventListener('submit',e=>{e.preventDefault();const i=$('#captureInput');addTask(i.value,captureMinutes,'medium');i.value=''});$('#captureDuration').addEventListener('click',e=>{const b=e.target.closest('[data-capture-minutes]');if(b){captureMinutes=+b.dataset.captureMinutes;renderCollect()}});$('#clearDoneBtn').addEventListener('click',clearCompleted);
+$('#taskList').addEventListener('click',e=>{const a=e.target.closest('[data-activate]'),c=e.target.closest('[data-complete]'),d=e.target.closest('[data-delete]');if(a)activateTask(a.dataset.activate);if(c)completeTask(c.dataset.complete,false);if(d)deleteTask(d.dataset.delete)});
+$('#focusStage').addEventListener('click',e=>{if(e.target.closest('#drawBtn'))drawTask();if(e.target.closest('#newTaskBtn'))newPrompt();const m=e.target.closest('[data-focus-minutes]');if(m)setMinutes(+m.dataset.focusMinutes);if(e.target.closest('#timerToggle'))startPause();if(e.target.closest('#timerReset'))resetTimer(true);if(e.target.closest('#breakBtn')){microOpen=!microOpen;renderFocus()}if(e.target.closest('#completeBtn'))completeTask(state.activeId,true);if(e.target.closest('#skipBtn'))skipTask();if(e.target.closest('#flowBtn'))addFlow();if(e.target.closest('#completeExpiredBtn'))completeTask(state.activeId,true)});
+$('#resetRoot').addEventListener('click',e=>{const c=e.target.closest('[data-reset-mode]');if(c)startReset(c.dataset.resetMode);if(e.target.closest('#resetBack')||e.target.closest('#resetStop'))renderResetHome()});
+}
+async function sw(){if(!('serviceWorker'in navigator))return;try{const r=await navigator.serviceWorker.register(`./sw.js?v=${BUILD}`,{updateViaCache:'none'});r.update().catch(()=>{});addEventListener('focus',()=>r.update().catch(()=>{}));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')r.update().catch(()=>{})});}catch{}}
+bind();renderAll();renderResetHome();save();sw();
 })();

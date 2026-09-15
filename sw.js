@@ -1,5 +1,5 @@
 'use strict';
-const V='2.0.0', C=`focus-morrow-${V}`;
+const V='2.0.1', C=`focus-morrow-${V}`;
 const CORE=['./','./index.html','./app.js?v=2.0.0','./manifest.json?v=2.0.0'];
 
 self.addEventListener('install',e=>e.waitUntil((async()=>{
